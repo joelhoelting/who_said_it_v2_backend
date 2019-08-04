@@ -2,8 +2,11 @@ class Api::V1::GamesController < ApplicationController
   skip_before_action :authorized, only: [:create]
 
   def create
-		@game = Game.create(difficulty_params)
-    @game.add_characters_to_game(characters_array_params[:characters])
+    @game = Game.create(difficulty_params)
+    
+    character_ids = characters_array_params[:characters].map {|character| character[:id] }
+    @game.add_characters_to_game(character_ids)
+    
     render json: @game, status: 201
 	end
 

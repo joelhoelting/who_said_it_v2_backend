@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  has_many :games
+
   validates :email, 
     presence: true, 
     uniqueness: { case_sensitive: false, message: "Email has already been taken" }, 
@@ -6,6 +8,7 @@ class User < ApplicationRecord
     on: :create
 
   has_secure_password
+
   before_save :downcase_fields
 
   private

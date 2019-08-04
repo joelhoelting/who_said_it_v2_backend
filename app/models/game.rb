@@ -19,10 +19,8 @@ class Game < ApplicationRecord
     end
   end
 
-  def add_characters_to_game(character_array)
-    character_array.each do |character|
-      characters << Character.find_by(character)
-    end
+  def add_characters_by_id(character_ids)
+    character_ids.each { |id| characters << Character.find(id) }
   end
 
   private
