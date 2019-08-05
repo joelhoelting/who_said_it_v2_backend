@@ -3,20 +3,29 @@ require 'rails_helper'
 RSpec.describe User, type: :model do
   before do
     @password = "test123"
-    @invalid_user = User.create(email: "testemail", password: @password)
+    @invalid_user = User.new(email: "testemail", password: @password)
 
     @valid_user = User.create(email: "test@email.com", password: @password)
 
-    @duplicate_user = User.create(email: "test@email.com", password: @password)
-    @duplicate_user_case_insensitive = User.create(email: "TEST@email.com", password: @password)
+    @duplicate_user = User.new(email: "test@email.com", password: @password)
+    @duplicate_user_case_insensitive = User.new(email: "TEST@email.com", password: @password)
 
     # Associations between users and games
     @user_with_many_games = User.create(email: "hasmanygames@email.com", password: @password)  
-    @game1 = Game.create(difficulty: "easy")
-    @game1.add_characters_by_id([1,2])
-    @game2 = Game.create(difficulty: "easy")
-    @game1.add_characters_by_id([3,4])
-    @user_with_many_games.games = [@game1, @game2]
+    
+    @easy_game = Game.new(difficulty: "easy")
+    @easy_game.add_characters_by_id([1,2])
+    @easy_game.save
+
+    @medium_game = Game.new(difficulty: "medium")
+    @medium_game.add_characters_by_id([3,4,5])
+    @medium_game.save
+
+    @hard_game = Game.new(difficulty: "hard")
+    @hard_game.add_characters_by_id([6,7,8])
+    @hard_game.save
+
+    [@easy_game, @medium_game, @hard_game].each { |game| @user_with_many_games.games << game }
   end
 
   context 'Model validations' do
@@ -46,8 +55,8 @@ RSpec.describe User, type: :model do
   end
 
   context 'Model associations' do
-    it 'can optionally have many games' do
-      expect(@user_with_many_games.games.length).to eq(2)
+    it 'Has many games' do
+      expect(@user_with_many_games.games.length).to eq(3)
     end
   end
 end

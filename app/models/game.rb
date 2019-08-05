@@ -6,8 +6,8 @@ class Game < ApplicationRecord
   serialize :ten_quote_ids, Array
   serialize :state, Array
 
-  validates :difficulty, inclusion: { in: ['easy', 'medium', 'hard'] }
-  # validates :validate_num_of_characters
+  validates :difficulty, inclusion: { in: ['easy', 'medium', 'hard'], message: "Must have a difficulty level: easy, medium or hard" }
+  validate :validate_num_of_characters
 
   def game_quotes
     if ten_quote_ids.length == 10
@@ -25,10 +25,14 @@ class Game < ApplicationRecord
 
   private
 
-    def validate_num_of_characters
-      case difficulty
-      when 'easy'
-        binding.pry
-      end
+  def validate_num_of_characters
+    case difficulty
+    when "easy"
+      characters.length != 2 && errors.add(:difficulty, "Must have two characters")
+    when "medium"
+      characters.length != 3 && errors.add(:difficulty, "Must have three characters")
+    when "hard"
+      characters.length != 4 && errors.add(:difficulty, "Must have three characters")
     end
+  end
 end

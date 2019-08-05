@@ -1,4 +1,4 @@
 class Quote < ApplicationRecord
   belongs_to :character
-  validates :character, presence: true
+  validates_presence_of :content, :source, :character
 end
