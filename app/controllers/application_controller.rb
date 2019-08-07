@@ -16,7 +16,7 @@ class ApplicationController < ActionController::API
     request.headers['Authorization']
   end
 
-  def decoded_token
+  def decode_token
     if auth_header
       token = auth_header.split(' ')[1]
       # headers: { 'Authorization': 'Bearer <token>' }
@@ -30,10 +30,10 @@ class ApplicationController < ActionController::API
   end
   
   def current_user
-    if decoded_token
+    if decode_token
       # decoded_token=> [{"user_id"=>2}, {"alg"=>"HS256"}]
       # or nil if we can't decode the token
-      user_id = decoded_token[0]['user_id']
+      user_id = decode_token[0]['user_id']
       @user = User.find_by(id: user_id)
     end
   end
