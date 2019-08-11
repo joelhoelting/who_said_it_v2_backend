@@ -29,7 +29,7 @@ RSpec.describe Game, type: :model do
     @user_with_games.games = [@easy_game, @medium_game, @hard_game]
   end
 
-  context 'Model validations' do
+  context 'model validations' do
     it 'cannot be saved without a difficulty level' do
       expect(@game_without_difficulty_level).to_not be_valid
     end
@@ -52,7 +52,7 @@ RSpec.describe Game, type: :model do
     end
   end
 
-  context 'Model associations' do
+  context 'model associations' do
     it 'can belong to a user' do
       expect(@easy_game.user).to eq(@user_with_games)
       expect(@medium_game.user).to eq(@user_with_games)
