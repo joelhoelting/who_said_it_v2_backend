@@ -6,7 +6,6 @@ class Api::V1::GamesController < ApplicationController
     
     character_ids = characters_array_params[:characters].map {|character| character[:id] }
     @game.add_characters_by_id(character_ids)
-    binding.pry
 
     if @game.valid? 
       @game.save
