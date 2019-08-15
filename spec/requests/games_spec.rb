@@ -1,10 +1,12 @@
 require 'json'
+require 'support/requests/auth_request_helpers'
 require 'support/requests/game_request_helpers'
 require 'support/json_helper'
 
 RSpec.configure do |c|
   c.include GameRequestHelpers
   c.include JSONHelper
+  c.include AuthRequestHelpers
 end
 
 RSpec.describe "Games", type: :request do
@@ -35,29 +37,25 @@ RSpec.describe "Games", type: :request do
         {:id => 10, :slug => "mr_krabs" }
       ]
     }
+
+    @game_hashes = [@easy_game_hash, @medium_game_hash, @hard_game_hash]
+
+    @valid_user = User.create(email: "validuser@valid.com", password: "validuser123")
   end
 
   context "unauthenticated: creates games" do
     it "succeeds in creating easy, medium and hard games" do
-      games = [@easy_game_hash, @medium_game_hash, @hard_game_hash]
-      validate_games(games)
+      validate_games(@game_hashes)
+    end
+  end
+
+  context "authenticated: creates games" do
+    it "succeeds in logging in and creating a game associated with logged in user" do
+      sign_in_user("validuser@valid.com", "validuser123")
+      token = response_body_to_json["jwt"]
+      
+      validate_games_with_token(@game_hashes, token, @valid_user)
+      expect(@valid_user.games.count).to eq(3)
     end
   end
 end
-
-private
-
-  def validate_games(hash_array)
-    hash_array.each do |hash|
-      character_count = hash[:characters].count
-      create_game(hash)
-
-      expect(response.header['Content-Type']).to include('application/json')
-      expect(response.status).to eq(201)
-
-      game_response_id = response_body_to_json["id"]
-
-      expect(game_response_id).to eq(Game.last.id)
-      expect(Game.find(game_response_id).characters.count).to eq(character_count)
-    end
-  end
