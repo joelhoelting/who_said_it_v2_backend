@@ -31,6 +31,6 @@ class Api::V1::AuthController < ApplicationController
   private
 
   def user_credential_params
-    params.permit(:email, :password)
+    params.permit(:email, :password, :password_confirmation)
   end
 end
