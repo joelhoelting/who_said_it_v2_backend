@@ -24,13 +24,13 @@ class Api::V1::AuthController < ApplicationController
       token = encode_token({ user_id: @user.id })
       render json: { user: @user, jwt: token }, status: :accepted
     else
-      render json: { message: 'Invalid credentials' }, status: :unauthorized
+      render json: { error: 'Invalid credentials' }, status: :unauthorized
     end
   end
 
   private
 
   def user_credential_params
-    params.permit(:email, :password)
+    params.permit(:email, :password, :password_confirmation)
   end
 end

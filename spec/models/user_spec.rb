@@ -28,7 +28,7 @@ RSpec.describe User, type: :model do
     [@easy_game, @medium_game, @hard_game].each { |game| @user_with_many_games.games << game }
   end
 
-  context 'Model validations' do
+  context 'model validations' do
     it 'cannot be created with invalid email address' do
       expect(@invalid_user).to_not be_valid
     end
@@ -54,7 +54,7 @@ RSpec.describe User, type: :model do
     end
   end
 
-  context 'Model associations' do
+  context 'model associations' do
     it 'Has many games' do
       expect(@user_with_many_games.games.length).to eq(3)
     end

@@ -25,7 +25,7 @@ RSpec.describe Character, type: :model do
     @medium_game.save
   end
 
-  context 'Model validations' do
+  context 'model validations' do
     it 'cannot be saved without a slug' do
       expect(@character_without_slug).to_not be_valid
     end
@@ -39,7 +39,7 @@ RSpec.describe Character, type: :model do
     end
   end
 
-  context 'Model associations' do
+  context 'model associations' do
     it 'has many quotes' do
       expect(@character1.quotes.count).to eq(1)
     end

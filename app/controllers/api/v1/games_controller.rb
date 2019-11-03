@@ -5,10 +5,13 @@ class Api::V1::GamesController < ApplicationController
     @game = Game.new(difficulty_params)
     
     character_ids = characters_array_params[:characters].map {|character| character[:id] }
+    
     @game.add_characters_by_id(character_ids)
-    binding.pry
 
-    if @game.valid? 
+    # Associate game with user if user is logged in
+    @game.user = current_user if logged_in?
+
+    if @game.valid?
       @game.save
       return render json: @game, status: 201
     end

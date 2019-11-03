@@ -9,7 +9,7 @@ RSpec.describe Quote, type: :model do
     @quote_without_source = Quote.create(content: "Description of quote without source", character_id: @character1.id)
   end
 
-  context 'Model validations' do
+  context 'model validations' do
     it 'must belong to a character' do
       expect(@valid_quote.character).to eq(@character1)
     end
@@ -23,7 +23,7 @@ RSpec.describe Quote, type: :model do
     end
   end
 
-  context 'Model associations' do
+  context 'model associations' do
     it 'belongs to a character' do
       expect(@valid_quote.character).to eq(@character1)
     end
