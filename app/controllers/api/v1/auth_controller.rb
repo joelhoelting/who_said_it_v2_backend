@@ -18,11 +18,10 @@ class Api::V1::AuthController < ApplicationController
 
   def signin
     @user = User.find_by(email: user_credential_params[:email])
-    # authenticate method comes from BCrypt
+    # authenticate method comes from bcrypt
     if @user && @user.authenticate(user_credential_params[:password])
-      # encode token comes from ApplicationController
-      token = encode_token({ user_id: @user.id })
-      render json: { user: @user, jwt: token }, status: :accepted
+      @token = encode_token({ user_id: @user.id })
+      render json: { user: @user, jwt: @token }, status: :accepted
     else
       render json: { error: 'Invalid credentials' }, status: :unauthorized
     end
