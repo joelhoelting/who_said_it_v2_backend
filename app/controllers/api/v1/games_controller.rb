@@ -1,18 +1,16 @@
 class Api::V1::GamesController < ApplicationController
   skip_before_action :authorized, only: [:create]
 
-  def create
+	def create
     @game = Game.new(difficulty_params)
     
-    character_ids = characters_array_params[:characters].map {|character| character[:id] }
-    
-    @game.add_characters_by_id(character_ids)
+		@game.add_characters_by_id(character_params[:characters])
 
     # Associate game with user if user is logged in
-    @game.user = current_user if logged_in?
-
+		@game.user = current_user if logged_in?
+		binding.pry
     if @game.valid?
-      @game.save
+			@game.save
       return render json: @game, status: 201
     end
 
@@ -36,15 +34,11 @@ class Api::V1::GamesController < ApplicationController
 
 	private
 
-	def characters_array_params
-		params.permit(characters: [:id, :slug])
+	def character_params
+		params.permit(:characters => [])
 	end
 
 	def difficulty_params
 		params.permit(:difficulty)
-	end
-
-	def postgame_params
-		params.permit(:id, :state => [])
 	end
 end
