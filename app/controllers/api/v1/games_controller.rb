@@ -3,12 +3,10 @@ class Api::V1::GamesController < ApplicationController
 
 	def create
     @game = Game.new(difficulty_params)
-    
 		@game.add_characters_by_id(character_params[:characters])
 
     # Associate game with user if user is logged in
 		@game.user = current_user if logged_in?
-		binding.pry
     if @game.valid?
 			@game.save
       return render json: @game, status: 201
