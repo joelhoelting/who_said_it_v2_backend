@@ -33,29 +33,25 @@ class Api::V1::GamesController < ApplicationController
 	end
 
 	def check_answer
-		# 1. get quote id
-		# 2. get character selected
-		# 3. responds with correct add_characters_by_id
-		@quote = Quote.find(quote_params[:id])
-		@character = Character.find(character_params[:id])
-		
-		@json = { :evaluation => @quote.character == @character, :correct_character => @quote.character }
+		@character = Character.find(answer_params[:character_id])	
+		@quote = Quote.find(answer_params[:quote_id])
+
+		@json = { 
+			:evaluation => @quote.character.id == @character.id, 
+			:correct_character => @quote.character.strip_character_params,
+		}
 		
 		return render :json => @json, status: :ok
 	end
 
 	private
 
-	def character_params
-		params.require(:character).permit(:id, :description, :name, :slug)
+	def answer_params
+		params.require(:answer).permit(:character_id, :quote_id)
 	end
 
 	def characters_params
 		params.permit(:characters => [])
-	end
-
-	def quote_params
-		params.require(:quote).permit(:id, :content)
 	end
 
 	def difficulty_params
