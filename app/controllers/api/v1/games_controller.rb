@@ -1,12 +1,20 @@
 class Api::V1::GamesController < ApplicationController
-  skip_before_action :authorized, :only => [:create, :check_answer]
+	before_action :set_game, :only => [:show, :update]
+	skip_before_action :authorized, :only => [:create, :check_answer]
+	
+	# Authenticated - game belonging to user
+	def show
+		@game = Game.find(params[:id])
+		render json: @game
+	end
 
 	def create
     @game = Game.new(difficulty_params)
-		@game.add_characters_by_id(characters_params[:characters])
+		@game.add_characters_by_id(character_id_params[:characters])
 
-    # Associate game with user if user is logged in
+    # Associate game with current user if user is logged in
 		@game.user = current_user if logged_in?
+
     if @game.valid?
 			@game.save
       return render :json => @game, :status => 201
@@ -26,12 +34,6 @@ class Api::V1::GamesController < ApplicationController
 		render json: @games
 	end
 
-	# Authenticated - game belonging to user
-	def show
-		@game = Game.find(params[:id])
-		render json: @game
-	end
-
 	def check_answer
 		@character = Character.find(answer_params[:character_id])	
 		@quote = Quote.find(answer_params[:quote_id])
@@ -46,11 +48,15 @@ class Api::V1::GamesController < ApplicationController
 
 	private
 
+	def postgame_params
+		params.require(:postgame).permit(:state, :completed)
+	end
+
 	def answer_params
 		params.require(:answer).permit(:character_id, :quote_id)
 	end
 
-	def characters_params
+	def character_id_params
 		params.permit(:characters => [])
 	end
 
