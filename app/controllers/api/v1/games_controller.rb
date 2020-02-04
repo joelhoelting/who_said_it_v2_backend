@@ -27,10 +27,10 @@ class Api::V1::GamesController < ApplicationController
 		@game = Game.find(params[:id])
 
 		if @game.completed
-			return render :json => { :response => 'Resource cannot be altered'}, :status => :forbidden
+			return render :json => { :response => 'Resource cannot be modified'}, :status => :forbidden
 		end
 		
-		# 'update_game' helper method
+		# 'update_game' helper method -- concerns/games_helper.rb
 		return render :json => update_game(@game, answer_params)
   end
 
