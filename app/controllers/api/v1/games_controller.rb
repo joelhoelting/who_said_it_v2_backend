@@ -31,13 +31,17 @@ class Api::V1::GamesController < ApplicationController
 		end
 		
 		# 'update_game' helper method -- concerns/games_helper.rb
-		return render :json => update_game(@game, answer_params)
+		render :json => update_game(@game, answer_params)
   end
 
-	# Authenticated - all games belonging to user
+	# Authenticated - User games
 	def index
-		@games = Game.all
-		render json: @games
+		if current_user
+			@games = current_user.games
+			return render json: @games
+		end
+		
+		render json: { :error => 'Resource requires authorization' }, :status => :unauthorized
 	end
 
 	private
