@@ -32,7 +32,7 @@ module GamesHelper
     
     game.update(:state => game.state << game_state_hash, :completed => completed)
 
-		{ 
+		return { 
 			:evaluation => quote.character.id == character.id,
 			:correct_character => quote.character.strip_character_params,
 			:selected_character => character.strip_character_params,
