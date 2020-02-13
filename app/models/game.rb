@@ -20,7 +20,7 @@ class Game < ApplicationRecord
   end
 
   def add_characters_by_id(character_ids)
-    character_ids.each { |id| characters << Character.find(id) }
+    character_ids.sort.each { |id| characters << Character.find(id) }
   end
 
   private

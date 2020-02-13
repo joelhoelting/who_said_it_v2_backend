@@ -5,7 +5,7 @@ class Api::V1::GamesController < ApplicationController
 	# Authenticated - game belonging to user
 	def show
 		@game = Game.find(params[:id])
-		render :json => @game
+		render :json => render_game_state(@game.state)
 	end
 
 	def create
