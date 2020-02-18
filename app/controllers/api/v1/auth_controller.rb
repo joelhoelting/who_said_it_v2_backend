@@ -1,7 +1,7 @@
 class Api::V1::AuthController < ApplicationController
   skip_before_action :authorized, :only => [:signup, :signin]
 
-  def profile
+  def validate_token
     @user = current_user
     render json: { :user => @user }, :status => :accepted
   end

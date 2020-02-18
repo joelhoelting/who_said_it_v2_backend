@@ -6,7 +6,8 @@ Rails.application.routes.draw do
       end
       resources :characters, only: [:index, :show]
       resources :quotes, only: [:show]
-      get '/profile', to: 'auth#profile'
+      
+      get '/validate_token', to: 'auth#validate_token'
       post '/signup', to: 'auth#signup'
       post '/signin', to: 'auth#signin'
     end

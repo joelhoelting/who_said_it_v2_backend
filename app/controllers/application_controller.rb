@@ -5,8 +5,8 @@ class ApplicationController < ActionController::API
 
   def encode_token(payload)
     # payload => {:user_id => 5 }
-    # Set token expire time to 1 hour
-    payload[:exp] = Time.now.to_i + 4 * 3600
+    # payload[:exp] = Time.now.to_i + 4 * 3600
+    payload[:exp] = Time.now.to_i + 50
     JWT.encode(payload, JWT_SECRET)
     # jwt string: "eyJhbGciOiJIUzI1NiJ9.eyJiZWVmIjoic3RlYWsifQ._IBTHTLGX35ZJWTCcY30tLmwU9arwdpNVxtVU0NpAuI"
   end
@@ -22,7 +22,6 @@ class ApplicationController < ActionController::API
       # headers: { 'Authorization': 'Bearer <token>' }
       begin
         JWT.decode(token, JWT_SECRET, true, algorithm: 'HS256')
-        # JWT.decode => [{ "beef"=>"steak" }, { "alg"=>"HS256" }]
       rescue JWT::DecodeError
         nil
       end
@@ -32,11 +31,19 @@ class ApplicationController < ActionController::API
   def current_user
     if decode_token
       # decoded_token=> [{"user_id"=>2}, {"alg"=>"HS256"}]
-      # or nil if we can't decode the token
       user_id = decode_token[0]['user_id']
+
+      # TODO REFRESH LOGIC
+      # refresh_token(user_id)
+
       @user = User.find_by(id: user_id)
     end
   end
+
+  # def refresh_token(user_id)
+  #   payload = { :exp => Time.now.to_i + 300, :user_id => user_id }
+  #   response.headers["jwt"] = JWT.encode(payload, JWT_SECRET)
+  # end
 
   def logged_in?
     !!current_user
