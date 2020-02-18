@@ -37,7 +37,7 @@ class Api::V1::GamesController < ApplicationController
 	# Authenticated - User games
 	def index
 		if current_user
-			@games = current_user.games
+			@games = current_user.games.where("completed = true")
 			return render json: @games
 		end
 		

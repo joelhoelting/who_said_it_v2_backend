@@ -5,8 +5,8 @@ class ApplicationController < ActionController::API
 
   def encode_token(payload)
     # payload => {:user_id => 5 }
-    # payload[:exp] = Time.now.to_i + 4 * 3600
-    payload[:exp] = Time.now.to_i + 50
+    payload[:exp] = Time.now.to_i + 4 * 3600
+    # payload[:exp] = Time.now.to_i + 50
     JWT.encode(payload, JWT_SECRET)
     # jwt string: "eyJhbGciOiJIUzI1NiJ9.eyJiZWVmIjoic3RlYWsifQ._IBTHTLGX35ZJWTCcY30tLmwU9arwdpNVxtVU0NpAuI"
   end
