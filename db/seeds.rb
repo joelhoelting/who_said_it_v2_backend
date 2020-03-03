@@ -104,3 +104,22 @@ character_count = Character.all.count
 quote_count = Quote.all.count
 
 puts "Total Characters: #{character_count}, Total Quotes: #{quote_count}"
+
+# game = Game.new(
+#   difficulty: "easy",
+#   state:
+#    [{:correct_character=>6, :selected_character=>5, :quote=>205, :evaluation=>false},
+#     {:correct_character=>5, :selected_character=>6, :quote=>156, :evaluation=>false},
+#     {:correct_character=>5, :selected_character=>5, :quote=>178, :evaluation=>true},
+#     {:correct_character=>6, :selected_character=>6, :quote=>197, :evaluation=>true},
+#     {:correct_character=>5, :selected_character=>5, :quote=>163, :evaluation=>true}],
+#   ten_quote_ids: [205, 156, 178, 197, 163, 188, 183, 198, 161, 181],
+#   completed: true,
+#   user_id: 9,
+# )
+
+# character1 = Character.find(5)
+# character2 = Character.find(6)
+
+# game.characters = [character1, character2]
+# game.save
