@@ -1,4 +1,4 @@
-module AuthHelper
+module UsersHelper
   RECAPTCHA_MINIMUM_SCORE = 0.5
 
   def verify_recaptcha(recaptcha_action, token)
@@ -8,7 +8,6 @@ module AuthHelper
     response = Net::HTTP.get_response(uri)
 
     json = JSON.parse(response.body)
-    binding.pry
 
     json['success'] && json['score'] > RECAPTCHA_MINIMUM_SCORE && json['action'] == recaptcha_action
   end

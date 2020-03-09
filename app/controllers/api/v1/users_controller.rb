@@ -1,5 +1,5 @@
-class Api::V1::AuthController < ApplicationController
-  include AuthHelper
+class Api::V1::UsersController < ApplicationController
+  include UsersHelper
   skip_before_action :authorized, :only => [:signup, :signin]
 
   def validate_token
