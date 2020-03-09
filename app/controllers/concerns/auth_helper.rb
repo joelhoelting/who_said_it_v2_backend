@@ -8,6 +8,7 @@ module AuthHelper
     response = Net::HTTP.get_response(uri)
 
     json = JSON.parse(response.body)
+    binding.pry
 
     json['success'] && json['score'] > RECAPTCHA_MINIMUM_SCORE && json['action'] == recaptcha_action
   end

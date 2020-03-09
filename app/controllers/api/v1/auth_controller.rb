@@ -17,9 +17,9 @@ class Api::V1::AuthController < ApplicationController
       return render :json => { :error => 'User with email address already exists' }, :status => :conflict
     end
 
-    @user = User.create(user_credential_params)
+    @user = User.new(user_credential_params)
 
-    if @user.valid?
+    if @user.save
       @token = encode_token(:user_id => @user.id)
       render :json => { :user => @user, :jwt => @token }, :status => :created
     else
@@ -28,6 +28,10 @@ class Api::V1::AuthController < ApplicationController
   end
 
   def signin
+    if !verify_recaptcha('signin', recaptcha_params[:token])
+      return render :json => { :error => 'Authentication Failure' }, :status => :unauthorized
+    end
+
     @user = User.find_by(:email => user_credential_params[:email])
 
     # authenticate method comes from bcrypt
