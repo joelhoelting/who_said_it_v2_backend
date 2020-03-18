@@ -42,11 +42,6 @@ class ApplicationController < ActionController::API
     end
   end
 
-  # def refresh_token(user_id)
-  #   payload = { :exp => Time.now.to_i + 300, :user_id => user_id }
-  #   response.headers["jwt"] = JWT.encode(payload, JWT_SECRET)
-  # end
-
   def logged_in?
     !!current_user
   end
