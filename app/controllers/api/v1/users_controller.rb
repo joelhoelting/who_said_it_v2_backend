@@ -1,6 +1,6 @@
 class Api::V1::UsersController < ApplicationController
   include UsersHelper
-  skip_before_action :authorized, :only => [:signup, :signin, :confirm_email]
+  skip_before_action :authorized, :only => [:signup, :signin, :confirm_email, :resend_confirmation_email]
 
   def validate_token
     @user = current_user
@@ -21,7 +21,6 @@ class Api::V1::UsersController < ApplicationController
 
     if @user.valid?
       @user.generate_token_and_send_instructions(token_type: :email_confirmation)
-      
       render :json => { :email => @user.email, :message => 'Check email for confirmation' }, :status => :created
     else
       render :json => { :error => 'Failed to create user' }, :status => :not_acceptable
@@ -43,6 +42,17 @@ class Api::V1::UsersController < ApplicationController
     @token = encode_token(:user_id => @user.id)
 
     render :json => { :user => @user.parsed_user_data, :jwt => @token }, :status => :ok
+  end
+
+  def resend_confirmation_email
+    @user = User.find_by(email: user_credential_params[:email])
+
+    if !@user
+      return render :json => { :error => 'Cannot find a user with that email', :redirect => '/signup' }, :status => :not_acceptable
+    else
+      @user.generate_token_and_send_instructions(token_type: :email_confirmation)
+      render :json => { :email => @user.email, :message => 'Please check your email for new confirmation instructions' }, :status => :ok
+    end
   end
 
   def signin
