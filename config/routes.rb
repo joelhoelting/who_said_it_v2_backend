@@ -7,12 +7,13 @@ Rails.application.routes.draw do
       resources :characters, :only => [:index, :show]
       resources :quotes, :only => [:show]
       
+      # Authentication
+      post '/signup', :to => 'users#signup'
       post '/confirm_email', :to => 'users#confirm_email'
       post '/resend_confirmation_email', :to => 'users#resend_confirmation_email'
-      get '/validate_token', :to => 'users#validate_token'
-      post '/signup', :to => 'users#signup'
       post '/signin', :to => 'users#signin'
-      get '/users', :to => 'users#index'
+      post '/password_reset', :to => 'users#password_reset'
+      get '/validate_token', :to => 'users#validate_token'
     end
   end
 end

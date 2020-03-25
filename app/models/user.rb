@@ -12,12 +12,14 @@ class User < ApplicationRecord
 
   before_create :downcase_fields
 
-  def confirmation_token_expired?
-    (Time.now.utc - self.email_confirmation_sent_at) > 1.hour
+  def token_expired?(token_type:)
+    (Time.now.utc - self[:"#{token_type}_sent_at"]) > 1.hour
   end
 
-  def set_email_confirmed
-    self.update(:email_confirmed => true, :email_confirmation_token => nil, :email_confirmation_confirmed_at => DateTime.now)
+  def set_token_confirmed(token_type:)
+    self[:"#{token_type}_token"] = nil
+    self[:"#{token_type}_confirmed_at"] = DateTime.now
+    save!
   end
 
   def generate_token_and_send_instructions(token_type:)

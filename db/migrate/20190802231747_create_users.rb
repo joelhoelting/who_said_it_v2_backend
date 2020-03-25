@@ -8,9 +8,11 @@ class CreateUsers < ActiveRecord::Migration[5.2]
 
       t.string :email_confirmation_token
       t.datetime :email_confirmation_sent_at
-
+      t.datetime :email_confirmation_confirmed_at
+      
       t.string :password_reset_token
       t.datetime :password_reset_sent_at
+      t.datetime :password_reset_confirmed_at
 
       t.timestamps
     end

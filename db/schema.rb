@@ -57,6 +57,9 @@ ActiveRecord::Schema.define(version: 2019_08_03_060501) do
     t.string "email_confirmation_token"
     t.datetime "email_confirmation_sent_at"
     t.datetime "email_confirmation_confirmed_at"
+    t.string "password_reset_token"
+    t.datetime "password_reset_sent_at"
+    t.datetime "password_reset_confirmed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
