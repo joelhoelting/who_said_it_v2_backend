@@ -12,16 +12,14 @@ class User < ApplicationRecord
 
   before_create :downcase_fields
 
+  def awaiting_confirmation?(token_type:)
+    !self[:"#{token_type}_confirmed_at"]
+  end
+
   def token_expired?(token_type:)
     (Time.now.utc - self[:"#{token_type}_sent_at"]) > 1.hour
   end
-
-  def set_token_confirmed(token_type:)
-    self[:"#{token_type}_token"] = nil
-    self[:"#{token_type}_confirmed_at"] = DateTime.now
-    save!
-  end
-
+  
   def generate_token_and_send_instructions(token_type:)
     generate_token(:"#{token_type}_token")
     self[:"#{token_type}_sent_at"] = Time.now.utc
@@ -35,6 +33,13 @@ class User < ApplicationRecord
       self[column] = token
       break token unless User.exists?(column => token)
     end
+  end
+
+  def set_token_confirmed(token_type:)
+    self[:"#{token_type}_token"] = nil
+    self[:"#{token_type}_sent_at"] = nil
+    self[:"#{token_type}_confirmed_at"] = DateTime.now
+    save!
   end
 
   def parsed_user_data

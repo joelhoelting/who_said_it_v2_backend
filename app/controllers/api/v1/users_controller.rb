@@ -7,8 +7,8 @@ class Api::V1::UsersController < ApplicationController
     render :json => { :user => @user }, :status => :accepted
   end
 
-  def password_reset
-    if !verify_recaptcha('password_reset', recaptcha_params[:token])
+  def request_password_reset
+    if !verify_recaptcha('request_password_reset', recaptcha_params[:token])
       return render :json => { :error => 'Authentication Failure' }, :status => :unauthorized
     end
 
@@ -16,9 +16,19 @@ class Api::V1::UsersController < ApplicationController
 
     if @user
       @user.generate_token_and_send_instructions(token_type: :password_reset)
-      render :json => { :email => @user.email, :message => 'Check email for confirmation' }, :status => :created
+      render :json => { :email => @user.email, :success => 'Check email for password reset instructions' }, :status => :created
     else
       render :json => { :error => 'There is no user with that email' }, :status => :not_found
+    end
+  end
+
+  def confirm_password_reset_token
+    @user = User.find_by(password_reset_token: params[:token])
+
+    if @user && @user.awaiting_confirmation?(token_type: :password_reset)
+        render :json => { :success => 'Password reset link is valid' }, :status => :ok
+    else
+      render :json => { :error => 'Password reset link is invalid', :redirect => '/signin' }, :status => :not_found
     end
   end
 
@@ -56,7 +66,7 @@ class Api::V1::UsersController < ApplicationController
 
     if @user.valid?
       @user.generate_token_and_send_instructions(token_type: :email_confirmation)
-      render :json => { :email => @user.email, :message => 'Check email for confirmation' }, :status => :created
+      render :json => { :email => @user.email, :success => "Confirmation email sent to #{@user.email}" }, :status => :created
     else
       render :json => { :error => 'Failed to create user' }, :status => :not_acceptable
     end
@@ -78,7 +88,7 @@ class Api::V1::UsersController < ApplicationController
 
     @token = encode_token(:user_id => @user.id)
 
-    render :json => { :user => @user.parsed_user_data, :jwt => @token }, :status => :ok
+    render :json => { :success => 'Your account has been successfully created.', :user => @user.parsed_user_data, :jwt => @token }, :status => :ok
   end
 
   def resend_confirmation_email
@@ -88,7 +98,7 @@ class Api::V1::UsersController < ApplicationController
       return render :json => { :error => 'Cannot find a user with that email', :redirect => '/signup' }, :status => :not_acceptable
     else
       @user.generate_token_and_send_instructions(:token_type => :email_confirmation)
-      render :json => { :email => @user.email, :message => 'Please check your email for new confirmation instructions' }, :status => :ok
+      render :json => { :email => @user.email, :success => 'Please check your email for new confirmation instructions' }, :status => :ok
     end
   end
 
