@@ -43,7 +43,7 @@ class Api::V1::UsersController < ApplicationController
     if @user && @user.authenticate(user_credential_params[:password])
       if @user.email_confirmed
         @token = encode_token({ :user_id => @user.id })
-        render :json => { :user => @user.parsed_user_data, :jwt => @token }, :status => :accepted
+        render :json => { :success => 'Sign in successful', :user => @user.parsed_user_data, :jwt => @token }, :status => :accepted
       else
         render :json => { :error => 'Please confirm your email address' }, :status => :forbidden
       end
@@ -66,7 +66,10 @@ class Api::V1::UsersController < ApplicationController
 
     if @user.valid?
       @user.generate_token_and_send_instructions(token_type: :email_confirmation)
-      render :json => { :email => @user.email, :success => "Confirmation email sent to #{@user.email}" }, :status => :created
+      render :json => { 
+        :success => "Confirmation email sent to #{@user.email}", 
+        :email => @user.email, :success => "Confirmation email sent to #{@user.email}" 
+      }, :status => :created
     else
       render :json => { :error => 'Failed to create user' }, :status => :not_acceptable
     end

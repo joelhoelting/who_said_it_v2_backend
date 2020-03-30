@@ -1,6 +1,5 @@
 class Api::V1::CharactersController < ApplicationController
-  before_action :set_character, :only => [:show]
-  skip_before_action :authorized, :only => [:index, :show]
+  skip_before_action :authorized, :only => [:index]
 
   # GET /characters
   def index
