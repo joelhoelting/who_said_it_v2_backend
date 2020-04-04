@@ -23,19 +23,39 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def confirm_password_reset_token
-    @user = User.find_by(password_reset_token: params[:token])
+    @user = User.find_by(password_reset_token: params[:password_reset_token])
 
     if @user && @user.awaiting_confirmation?(token_type: :password_reset)
-        render :json => { :success => 'Password reset link is valid' }, :status => :ok
+      render :json => { :success => 'Password reset link is valid' }, :status => :ok
     else
-      render :json => { :error => 'Password reset link is invalid', :redirect => '/signin' }, :status => :not_found
+      render :json => { :error => 'Password reset link is invalid' }, :status => :not_found
+    end
+  end
+
+  def reset_password
+    if !verify_recaptcha('reset_password', recaptcha_params[:token])
+      return render :json => { :error => 'Authentication Failure' }, :status => :unauthorized
+    end
+
+    @user = User.find_by(password_reset_token: user_credential_params[:password_reset_token])
+
+    if @user.password_reset_token && @user.token_expired?(:token_type => :password_reset)
+      return render :json => { :error => 'Password reset link has expired. Please request a new one.'}, :status => :not_acceptable
+    end
+
+    if @user && @user.authenticate(user_credential_params[:original_password])
+      @user.set_token_confirmed(:token_type => :password_reset)
+      @user.update(password: user_credential_params[:password])
+      render :json => { :success => 'Password has been updated'}
+    else
+      render :json => { :error => 'This resource is not authorized' }, :status => :unauthorized
     end
   end
 
   def signin
-    # if !verify_recaptcha('signin', recaptcha_params[:token])
-    #   return render :json => { :error => 'Authentication Failure' }, :status => :unauthorized
-    # end
+    if !verify_recaptcha('signin', recaptcha_params[:token])
+      return render :json => { :error => 'Authentication Failure' }, :status => :unauthorized
+    end
 
     @user = User.find_by(:email => user_credential_params[:email])
 
@@ -53,9 +73,9 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def signup
-    # if !verify_recaptcha('signup', recaptcha_params[:token])
-    #   return render :json => { :error => 'Account could not be created' }, :status => :unauthorized
-    # end
+    if !verify_recaptcha('signup', recaptcha_params[:token])
+      return render :json => { :error => 'Account could not be created' }, :status => :unauthorized
+    end
 
     # Check if user with email already exists
     if User.find_by(:email => user_credential_params[:email])
@@ -98,7 +118,7 @@ class Api::V1::UsersController < ApplicationController
     @user = User.find_by(email: user_credential_params[:email])
 
     if !@user
-      return render :json => { :error => 'Cannot find a user with that email', :redirect => '/signup' }, :status => :not_acceptable
+      return render :json => { :error => 'Cannot find a user with that email' }, :status => :not_acceptable
     else
       @user.generate_token_and_send_instructions(:token_type => :email_confirmation)
       render :json => { :email => @user.email, :success => 'Please check your email for new confirmation instructions' }, :status => :ok
@@ -108,7 +128,7 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_credential_params
-    params.require(:auth).permit(:email, :password, :password_confirmation)
+    params.require(:auth).permit(:email, :original_password, :password, :password_confirmation, :password_reset_token)
   end
 
   def recaptcha_params
