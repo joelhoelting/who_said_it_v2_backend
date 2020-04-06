@@ -1,3 +1,5 @@
+# .authenticate method comes from bcrypt
+
 class Api::V1::UsersController < ApplicationController
   include UsersHelper
   skip_before_action :authorized, :except => [:validate_token]
@@ -15,7 +17,7 @@ class Api::V1::UsersController < ApplicationController
     @user = User.find_by(:email => user_credential_params[:email])
 
     if @user
-      @user.generate_token_and_send_instructions(token_type: :password_reset)
+      @user.generate_token_and_send_instructions(:token_type => :password_reset)
       render :json => { :email => @user.email, :success => 'Check email for password reset instructions' }, :status => :created
     else
       render :json => { :error => 'There is no user with that email' }, :status => :not_found
@@ -25,7 +27,7 @@ class Api::V1::UsersController < ApplicationController
   def confirm_password_reset_token
     @user = User.find_by(password_reset_token: params[:password_reset_token])
 
-    if @user && @user.awaiting_confirmation?(token_type: :password_reset)
+    if @user && @user.awaiting_confirmation?(:token_type => :password_reset)
       render :json => { :success => 'Password reset link is valid' }, :status => :ok
     else
       render :json => { :error => 'Password reset link is invalid' }, :status => :not_found
@@ -39,11 +41,9 @@ class Api::V1::UsersController < ApplicationController
 
     @user = User.find_by(password_reset_token: user_credential_params[:password_reset_token])
 
-    if @user.password_reset_token && @user.token_expired?(:token_type => :password_reset)
+    if @user && @user.token_expired?(:token_type => :password_reset, :expiration => 10.minutes)
       return render :json => { :error => 'Password reset link has expired. Please request a new one.'}, :status => :not_acceptable
-    end
-
-    if @user && @user.authenticate(user_credential_params[:original_password])
+    elsif @user
       @user.set_token_confirmed(:token_type => :password_reset)
       @user.update(password: user_credential_params[:password])
       render :json => { :success => 'Password has been updated'}
@@ -59,7 +59,6 @@ class Api::V1::UsersController < ApplicationController
 
     @user = User.find_by(:email => user_credential_params[:email])
 
-    # authenticate method comes from bcrypt
     if @user && @user.authenticate(user_credential_params[:password])
       if @user.email_confirmed
         @token = encode_token({ :user_id => @user.id })
@@ -102,7 +101,7 @@ class Api::V1::UsersController < ApplicationController
       return render :json => { :error => 'Email confirmation link is not valid.', :redirect => '/signup' }, :status => :not_acceptable
     end
 
-    if @user.email_confirmation_token && @user.token_expired?(:token_type => :email_confirmation)
+    if @user.email_confirmation_token && @user.token_expired?(:token_type => :email_confirmation, :expiration => 1.day)
       return render :json => { :error => 'Email confirmation link has expired. Please sign in again.', :redirect => '/signin' }, :status => :not_acceptable
     end
     

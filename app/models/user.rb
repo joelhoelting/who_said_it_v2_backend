@@ -16,8 +16,8 @@ class User < ApplicationRecord
     !self[:"#{token_type}_confirmed_at"]
   end
 
-  def token_expired?(token_type:)
-    (Time.now.utc - self[:"#{token_type}_sent_at"]) > 1.hour
+  def token_expired?(token_type:, expiration:)
+    (Time.now.utc - self[:"#{token_type}_sent_at"]) > expiration
   end
   
   def generate_token_and_send_instructions(token_type:)
