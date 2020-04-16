@@ -2,7 +2,7 @@
 
 class Api::V1::UsersController < ApplicationController
   include UsersHelper
-  skip_before_action :authorized, :except => [:validate_token]
+  skip_before_action :authorized, :except => [:delete_account, :update_password, :validate_token]
 
   def validate_token
     @user = current_user
@@ -45,11 +45,30 @@ class Api::V1::UsersController < ApplicationController
       return render :json => { :error => 'Password reset link has expired. Please request a new one.'}, :status => :not_acceptable
     elsif @user
       @user.set_token_confirmed(:token_type => :password_reset)
-      @user.update(password: user_credential_params[:password])
+      @user.update(:password => user_credential_params[:password])
       render :json => { :success => 'Password has been updated'}
     else
       render :json => { :error => 'This resource is not authorized' }, :status => :unauthorized
     end
+  end
+
+  def update_password
+    @user = current_user
+
+    if @user == @user.authenticate(user_credential_params[:original_password])
+      new_password = user_credential_params[:password]
+      password = user_credential_params[:password_confirmation]
+
+      if passwords_match?(new_password, password)
+        @user.update(:password => new_password)
+        render :json => { :success => 'Password has been updated' }, :status => :ok
+      else
+        render :json => { :error => 'Passwords do not match'}, :status => :unauthorized
+      end
+    else
+      render :json => { :error => 'Original password is incorrect'}, :status => :not_found
+    end
+    
   end
 
   def signin
@@ -121,6 +140,16 @@ class Api::V1::UsersController < ApplicationController
     else
       @user.generate_token_and_send_instructions(:token_type => :email_confirmation)
       render :json => { :email => @user.email, :success => 'Please check your email for new confirmation instructions' }, :status => :ok
+    end
+  end
+
+  def delete_account
+    @user = current_user
+
+    if @user.delete
+      return render :json => { :success => 'Account successfully deleted' }, :status => :ok
+    else
+      return render :json => { :error => 'There was an issue deleting account. Please try again.' }, :status => :bad_request
     end
   end
 

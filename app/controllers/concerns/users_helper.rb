@@ -11,5 +11,9 @@ module UsersHelper
 
     json['success'] && json['score'] > RECAPTCHA_MINIMUM_SCORE && json['action'] == recaptcha_action
   end
+
+  def passwords_match?(password1, password2)
+    return password1 == password2
+  end
 end
 
