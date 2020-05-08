@@ -3,7 +3,7 @@ require 'net/https'
 class ApplicationController < ActionController::API
   before_action :authorized
 
-  JWT_SECRET = Rails.application.credentials.jwt[:secret_key]
+  JWT_SECRET = Rails.application.credentials.JWT[:SECRET_KEY]
 
   def encode_token(payload)
     # payload => {:user_id => 5 }
