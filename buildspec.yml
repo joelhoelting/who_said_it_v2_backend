@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      ruby: 2.6.6
+      ruby: 2.6
   post_build:
     commands:
       - echo "CodeBuild Status (0 == fail, 1 == success) - $CODEBUILD_BUILD_SUCCEEDING"
