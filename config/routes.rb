@@ -5,6 +5,7 @@ Rails.application.routes.draw do
         post 'check_answer', on: :collection
       end
       resources :characters, :only => [:index, :show]
+      get '/test', :to => 'characters#test'
       resources :quotes, :only => [:show]
       
       # Authentication
