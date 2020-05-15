@@ -2,7 +2,6 @@ module UsersHelper
   RECAPTCHA_MINIMUM_SCORE = 0.5
 
   def verify_recaptcha(recaptcha_action, token)
-    binding.pry
     secret_key = Rails.application.credentials.RECAPTCHA[:SECRET_KEY]
 
     uri = URI.parse("https://www.google.com/recaptcha/api/siteverify?secret=#{secret_key}&response=#{token}")
