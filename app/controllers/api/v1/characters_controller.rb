@@ -1,9 +1,5 @@
 class Api::V1::CharactersController < ApplicationController
-  skip_before_action :authorized, :only => [:index, :test]
-
-  def test
-    render :json => { :test => "Hello World"}
-  end
+  skip_before_action :authorized, :only => [:index]
 
   # GET /characters
   def index
@@ -11,5 +7,4 @@ class Api::V1::CharactersController < ApplicationController
 
     render :json => @characters
   end
-
 end
