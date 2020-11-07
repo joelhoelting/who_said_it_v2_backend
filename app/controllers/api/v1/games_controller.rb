@@ -20,14 +20,14 @@ class Api::V1::GamesController < ApplicationController
       return render :json => @game, :status => 201
     end
 
-    render :json => { :error => @game.errors }, :status => :not_acceptable 
+    render :json => { :error_msg => @game.errors }, :status => :not_acceptable 
 	end
 
 	def update
 		@game = Game.find(params[:id])
 
 		if @game.completed
-			return render :json => { :response => 'Resource cannot be modified'}, :status => :forbidden
+			return render :json => { :error_msg => 'Resource cannot be modified'}, :status => :forbidden
 		end
 		
 		# 'update_game' helper method -- concerns/games_helper.rb
@@ -41,7 +41,7 @@ class Api::V1::GamesController < ApplicationController
 			return render json: @games
 		end
 		
-		render json: { :error => 'Resource requires authorization' }, :status => :unauthorized
+		render json: { :error_msg => 'Resource requires authorization' }, :status => :unauthorized
 	end
 
 	private
