@@ -6,7 +6,7 @@ class Api::V1::UsersController < ApplicationController
 
   def validate_token
     @user = current_user
-    render :json => { :user => @user }, :status => :accepted
+    render :json => { :user => @user.parsed_user_data }, :status => :accepted
   end
 
   def request_password_reset
@@ -81,7 +81,7 @@ class Api::V1::UsersController < ApplicationController
     if @user && @user.authenticate(user_credential_params[:password])
       if @user.email_confirmed
         @token = encode_token({ :user_id => @user.id })
-        render :json => { :success => 'Sign in successful', :user => @user.parsed_user_data, :jwt => @token }, :status => :accepted
+        render :json => { :jwt => @token, :success => 'Sign in successful', :user => @user.parsed_user_data }, :status => :accepted
       else
         render :json => { :error => 'Please confirm your email address' }, :status => :forbidden
       end
@@ -120,7 +120,7 @@ class Api::V1::UsersController < ApplicationController
       return render :json => { :error => 'Email confirmation link is not valid.', :redirect => '/signup' }, :status => :not_acceptable
     end
 
-    if @user.email_confirmation_token && @user.token_expired?(:token_type => :email_confirmation, :expiration => 1.day)
+    if @user.email_confirmation_token && @user.token_expired?(:token_type => :email_confirmation, :expiration => 1.hour)
       return render :json => { :error => 'Email confirmation link has expired. Please sign in again.', :redirect => '/signin' }, :status => :not_acceptable
     end
     
@@ -129,7 +129,7 @@ class Api::V1::UsersController < ApplicationController
 
     @token = encode_token(:user_id => @user.id)
 
-    render :json => { :success => 'Your account has been successfully created.', :user => @user.parsed_user_data, :jwt => @token }, :status => :ok
+    render :json => { :jwt => @token, :success => 'Your account has been successfully created.', :user => @user.parsed_user_data }, :status => :ok
   end
 
   def resend_confirmation_email
@@ -146,7 +146,7 @@ class Api::V1::UsersController < ApplicationController
   def delete_account
     @user = current_user
 
-    if @user.delete
+    if @user.games.delete_all && @user.delete
       return render :json => { :success => 'Account successfully deleted' }, :status => :ok
     else
       return render :json => { :error => 'There was an issue deleting account. Please try again.' }, :status => :bad_request
