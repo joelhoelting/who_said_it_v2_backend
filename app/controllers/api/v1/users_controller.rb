@@ -6,7 +6,8 @@ class Api::V1::UsersController < ApplicationController
 
   def validate_token
     @user = current_user
-    render :json => { :user => @user.parsed_user_data }, :status => :accepted
+    @token = encode_token({ :user_id => @user.id })
+    render :json => { :jwt => @token, :success => 'Valid login token', :user => @user.parsed_user_data }, :status => :accepted
   end
 
   def request_password_reset
@@ -71,7 +72,7 @@ class Api::V1::UsersController < ApplicationController
     
   end
 
-  def signin
+  def sign_in
     if !verify_recaptcha('signin', recaptcha_params[:token])
       return render :json => { :error => 'Authentication Failure' }, :status => :unauthorized
     end
@@ -90,7 +91,7 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  def signup
+  def sign_up
     if !verify_recaptcha('signup', recaptcha_params[:token])
       return render :json => { :error => 'Account could not be created' }, :status => :unauthorized
     end
