@@ -73,7 +73,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def sign_in
-    if !verify_recaptcha('signin', recaptcha_params[:token])
+    if !verify_recaptcha('sign_in', recaptcha_params[:token])
       return render :json => { :error_msg => 'Authentication Failure' }, :status => :unauthorized
     end
 
@@ -92,7 +92,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def sign_up
-    if !verify_recaptcha('signup', recaptcha_params[:token])
+    if !verify_recaptcha('sign_up', recaptcha_params[:token])
       return render :json => { :error_msg => 'Account could not be created' }, :status => :unauthorized
     end
 

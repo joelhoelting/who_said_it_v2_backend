@@ -44,7 +44,7 @@ class User < ApplicationRecord
 
   def parsed_user_data
     {
-      :id => id,
+      :created_at => created_at,
       :email => email
     }
   end
