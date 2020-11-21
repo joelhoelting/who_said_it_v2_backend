@@ -2,7 +2,7 @@
 
 class Api::V1::UsersController < ApplicationController
   include UsersHelper
-  skip_before_action :authorized, :except => [:delete_account, :update_password, :validate_token]
+  skip_before_action :authorized, :except => [:delete_account, :update_email, :update_password, :validate_token]
 
   def validate_token
     @user = current_user
@@ -53,6 +53,22 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
+  def update_email
+    if !verify_recaptcha('update_email', recaptcha_params[:token])
+      return render :json => { :error_msg => 'Authentication Failure' }, :status => :unauthorized
+    end
+
+    @user = current_user
+    new_email = user_credential_params[:email]
+    
+    if @user && @user.email != new_email
+      @user.update(:email => new_email)
+      render :json => { :success_msg => 'Email has been updated', :user => @user.parsed_user_data }, :status => :ok
+    else
+      render :json => { :error_msg => 'There was an issue updating your email address'}, :status => :not_found
+    end
+  end
+
   def update_password
     @user = current_user
 
@@ -69,7 +85,6 @@ class Api::V1::UsersController < ApplicationController
     else
       render :json => { :error_msg => 'Original password is incorrect'}, :status => :not_found
     end
-    
   end
 
   def sign_in

@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       get '/confirm_password_reset_token/:password_reset_token', :to => 'users#confirm_password_reset_token'
       post '/reset_password', :to => 'users#reset_password'
       post '/update_password', :to => 'users#update_password'
+      post '/update_email', :to => 'users#update_email'
     end
   end
 end
