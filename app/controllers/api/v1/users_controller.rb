@@ -115,14 +115,14 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def confirm_email
-    @user = User.find_by(email_confirmation_token: params[:confirm_token])
+    @user = User.find_by(email_confirmation_token: params[:confirmation_token])
 
     if !@user
-      return render :json => { :error_msg => 'Email confirmation link is not valid.', :redirect => '/signup' }, :status => :not_acceptable
+      return render :json => { :error_msg => 'Email confirmation link is not valid.', :redirect => '/sign_up' }, :status => :not_acceptable
     end
 
     if @user.email_confirmation_token && @user.token_expired?(:token_type => :email_confirmation, :expiration => 1.hour)
-      return render :json => { :error_msg => 'Email confirmation link has expired. Please sign in again.', :redirect => '/signin' }, :status => :not_acceptable
+      return render :json => { :error_msg => 'Email confirmation link has expired. Please sign in again.', :redirect => '/sign_in' }, :status => :not_acceptable
     end
     
     @user.set_token_confirmed(:token_type => :email_confirmation)
