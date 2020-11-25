@@ -93,16 +93,50 @@ class Api::V1::UsersController < ApplicationController
     end
 
     @user = User.find_by(:email => user_credential_params[:email])
+  
+    if !@user
+      return render :json => { :error_msg => 'Invalid credentials' }, :status => :unauthorized
+    end
 
-    if @user && @user.authenticate(user_credential_params[:password])
+    # Logic to handle locked out user (from logging in too many times)
+    if @user.authentication_lockout
+      time_to_wait = Time.now - @user.last_failed_login_attempt
+      if time_to_wait < 5.minutes
+        return render :json => { :error_msg => "You cannot login for #{(5.minutes - time_to_wait).round} seconds"}, :status => :unauthorized
+      else
+        @user.update(:authentication_lockout => false, :failed_login_attempts => 0)
+      end
+    end
+
+    # If user exists attempt to authenticate
+    if @user.authenticate(user_credential_params[:password])
       if @user.email_confirmed
+        # Conditionally reset failed login attempt counter to zero
+        @user.update(:failed_login_attempts => 0) if @user.failed_login_attempts > 0
+        
         @token = encode_token({ :user_id => @user.id })
         render :json => { :jwt => @token, :success_msg => 'Sign in successful', :user => @user.parsed_user_data }, :status => :accepted
       else
         render :json => { :error_msg => 'Please confirm your email address' }, :status => :forbidden
       end
     else
-      render :json => { :error_msg => 'Invalid credentials' }, :status => :unauthorized
+      @user.increment!(:failed_login_attempts).update(:last_failed_login_attempt => Time.now)
+
+      logins_until_lockout = 8
+
+      if @user.failed_login_attempts >= logins_until_lockout
+        @user.update(:authentication_lockout => true)
+        return render :json => { :error_msg => "You have logged in too many times. Please wait 5 minutes." }, :status => :unauthorized
+      end
+
+      if @user.failed_login_attempts > 2
+        return render :json => { 
+          :error_msg => "Password is invalid. #{logins_until_lockout - @user.failed_login_attempts} attempts remaining." 
+        }, 
+        :status => :unauthorized
+      else
+        return render :json => { :error_msg => "Password is invalid." }, :status => :unauthorized
+      end
     end
   end
 

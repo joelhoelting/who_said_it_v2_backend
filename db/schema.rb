@@ -60,6 +60,10 @@ ActiveRecord::Schema.define(version: 2019_08_03_060501) do
     t.string "password_reset_token"
     t.datetime "password_reset_sent_at"
     t.datetime "password_reset_confirmed_at"
+    t.datetime "last_successful_login"
+    t.datetime "last_failed_login_attempt"
+    t.integer "failed_login_attempts", default: 0
+    t.boolean "authentication_lockout", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
