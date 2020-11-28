@@ -9,7 +9,14 @@ module UsersHelper
 
     json = JSON.parse(response.body)
 
-    json['success'] && json['score'] > RECAPTCHA_MINIMUM_SCORE && json['action'] == recaptcha_action
+    recaptcha_valid = json['success'] && json['score'] > RECAPTCHA_MINIMUM_SCORE && json['action'] == recaptcha_action
+    
+    if !recaptcha_valid
+      render :json => { :error_msg => 'Authentication Failure' }, :status => :unauthorized
+      return false
+    end
+
+    return true
   end
 
   def passwords_match?(password1, password2)

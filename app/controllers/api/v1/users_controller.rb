@@ -11,9 +11,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def request_password_reset
-    if !verify_recaptcha('request_password_reset', recaptcha_params[:token])
-      return render :json => { :error_msg => 'Authentication Failure' }, :status => :unauthorized
-    end
+    return if !verify_recaptcha('request_password_reset', recaptcha_params[:token])
 
     @user = User.find_by(:email => user_credential_params[:email])
 
@@ -36,9 +34,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def reset_password
-    if !verify_recaptcha('reset_password', recaptcha_params[:token])
-      return render :json => { :error_msg => 'Authentication Failure' }, :status => :unauthorized
-    end
+    return if !verify_recaptcha('reset_password', recaptcha_params[:token])
 
     @user = User.find_by(password_reset_token: user_credential_params[:password_reset_token])
 
@@ -54,9 +50,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def update_email
-    if !verify_recaptcha('update_email', recaptcha_params[:token])
-      return render :json => { :error_msg => 'Authentication Failure' }, :status => :unauthorized
-    end
+    return if !verify_recaptcha('update_email', recaptcha_params[:token])
 
     @user = current_user
     new_email = user_credential_params[:email]
@@ -70,6 +64,8 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def update_password
+    return if !verify_recaptcha('update_password', recaptcha_params[:token])
+
     @user = current_user
 
     if @user == @user.authenticate(user_credential_params[:original_password])
@@ -88,9 +84,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def sign_in
-    if !verify_recaptcha('sign_in', recaptcha_params[:token])
-      return render :json => { :error_msg => 'Authentication Failure' }, :status => :unauthorized
-    end
+    return if !verify_recaptcha('sign_in', recaptcha_params[:token])
 
     @user = User.find_by(:email => user_credential_params[:email])
   
@@ -115,7 +109,7 @@ class Api::V1::UsersController < ApplicationController
         @user.update(:failed_login_attempts => 0) if @user.failed_login_attempts > 0
         
         @token = encode_token({ :user_id => @user.id })
-        render :json => { :jwt => @token, :success_msg => 'Sign in successful', :user => @user.parsed_user_data }, :status => :accepted
+        render :json => { :jwt => @token, :success_msg => 'Sign In successful', :user => @user.parsed_user_data }, :status => :accepted
       else
         render :json => { :error_msg => 'Please confirm your email address' }, :status => :forbidden
       end
@@ -141,9 +135,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def sign_up
-    if !verify_recaptcha('sign_up', recaptcha_params[:token])
-      return render :json => { :error_msg => 'Account could not be created' }, :status => :unauthorized
-    end
+    return if !verify_recaptcha('sign_up', recaptcha_params[:token])
 
     # Check if user with email already exists
     if User.find_by(:email => user_credential_params[:email])
