@@ -1,5 +1,4 @@
 class Api::V1::GamesController < ApplicationController
-	include GamesHelper
 	skip_before_action :authorized, :only => [:create, :check_answer, :update]
 	
 	# Authenticated - game belonging to user
@@ -9,8 +8,8 @@ class Api::V1::GamesController < ApplicationController
 	end
 
 	def create
-    @game = Game.new(difficulty_params)
-		@game.add_characters_by_id(character_id_params[:characters])
+    @game = Game.new(:difficulty => game_params[:difficulty])
+		@game.add_characters_by_id(game_params[:characters])
 
     # Associate game with current user if user is logged in
 		@game.user = current_user if logged_in?
@@ -31,7 +30,7 @@ class Api::V1::GamesController < ApplicationController
 		end
 		
 		# 'update_game' helper method -- concerns/games_helper.rb
-		render :json => update_game(@game, answer_params)
+		render :json => @game.check_answer_and_update(answer_params)
   end
 
 	# Authenticated - User games
@@ -50,11 +49,7 @@ class Api::V1::GamesController < ApplicationController
 		params.require(:answer).permit(:character_id, :quote_id, :quote_idx)
 	end
 
-	def character_id_params
-		params.permit(:characters => [])
-	end
-
-	def difficulty_params
-		params.permit(:difficulty)
+	def game_params
+		params.require(:game).permit(:difficulty, :characters => [])
 	end
 end

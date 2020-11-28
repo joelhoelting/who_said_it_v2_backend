@@ -2,13 +2,13 @@ module AuthRequestHelpers
   def sign_up_user(email=false, password=false)
     headers = { :CONTENT_TYPE => "application/json" }
     user_hash = tap_user_hash(email, password)
-    post "/api/v1/signup", :params => user_hash.to_json, :headers => headers
+    post "/api/v1/sign_up", :params => {:auth => user_hash.to_json}, :headers => headers
   end
   
   def sign_in_user(email, password)
     headers = { :CONTENT_TYPE => "application/json" }
     user_hash = tap_user_hash(email, password)
-    post "/api/v1/signin", :params => user_hash.to_json, :headers => headers
+    post "/api/v1/sign_in", :params => {:auth => user_hash.to_json}, :headers => headers
   end
 
   def get_route_without_token(url)

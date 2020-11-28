@@ -14,6 +14,7 @@ RSpec.describe "Authentication Requests", type: :request do
 
   context "sign up user" do
     it "fails to sign up a user without email address" do
+      allow(controller).to receive(:verify_recaptcha).and_return(true)
       sign_up_user(nil, "test123")
       
       expect(response.header['Content-Type']).to include('application/json')
