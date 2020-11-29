@@ -4,11 +4,59 @@ class Api::V1::UsersController < ApplicationController
   # include RecaptchaHelper
   skip_before_action :authorized, :except => [:delete_account, :update_email, :update_password, :validate_token]
 
+  # Authorized
+
+  def delete_account
+    @user = current_user
+
+    if @user.games.delete_all && @user.delete
+      return render :json => { :success_msg => 'Account successfully deleted' }, :status => :ok
+    else
+      return render :json => { :error_msg => 'There was an issue deleting account. Please try again.' }, :status => :bad_request
+    end
+  end
+
+  def update_email
+    # return if !verify_recaptcha('update_email', recaptcha_params[:token])
+
+    @user = current_user
+    new_email = user_credential_params[:email]
+    
+    if @user && @user.email != new_email
+      @user.update(:email => new_email)
+      render :json => { :success_msg => 'Email has been updated', :user => @user.parsed_user_data }, :status => :ok
+    else
+      render :json => { :error_msg => 'There was an issue updating your email address'}, :status => :not_found
+    end
+  end
+
+  def update_password
+    # return if !verify_recaptcha('update_password', recaptcha_params[:token])
+
+    @user = current_user
+
+    if @user == @user.authenticate(user_credential_params[:original_password])
+      new_password = user_credential_params[:password]
+      password = user_credential_params[:password_confirmation]
+
+      if passwords_match?(new_password, password)
+        @user.update(:password => new_password)
+        render :json => { :success_msg => 'Password has been updated' }, :status => :ok
+      else
+        render :json => { :error_msg => 'Passwords do not match'}, :status => :unauthorized
+      end
+    else
+      render :json => { :error_msg => 'Original password is incorrect'}, :status => :not_found
+    end
+  end
+
   def validate_token
     @user = current_user
     token = encode_token({ :user_id => @user.id })
     render :json => { :jwt => token, :success_msg => 'Valid login token', :user => @user.parsed_user_data }, :status => :accepted
   end
+
+  # Unauthorized
 
   def request_password_reset
     # return if !verify_recaptcha('request_password_reset', recaptcha_params[:token])
@@ -46,40 +94,6 @@ class Api::V1::UsersController < ApplicationController
       render :json => { :success_msg => 'Password has been updated'}
     else
       render :json => { :error_msg => 'This resource is not authorized' }, :status => :unauthorized
-    end
-  end
-
-  def update_email
-    # return if !verify_recaptcha('update_email', recaptcha_params[:token])
-
-    @user = current_user
-    new_email = user_credential_params[:email]
-    
-    if @user && @user.email != new_email
-      @user.update(:email => new_email)
-      render :json => { :success_msg => 'Email has been updated', :user => @user.parsed_user_data }, :status => :ok
-    else
-      render :json => { :error_msg => 'There was an issue updating your email address'}, :status => :not_found
-    end
-  end
-
-  def update_password
-    # return if !verify_recaptcha('update_password', recaptcha_params[:token])
-
-    @user = current_user
-
-    if @user == @user.authenticate(user_credential_params[:original_password])
-      new_password = user_credential_params[:password]
-      password = user_credential_params[:password_confirmation]
-
-      if passwords_match?(new_password, password)
-        @user.update(:password => new_password)
-        render :json => { :success_msg => 'Password has been updated' }, :status => :ok
-      else
-        render :json => { :error_msg => 'Passwords do not match'}, :status => :unauthorized
-      end
-    else
-      render :json => { :error_msg => 'Original password is incorrect'}, :status => :not_found
     end
   end
 
@@ -156,7 +170,8 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def confirm_email
-    @user = User.find_by(email_confirmation_token: params[:confirmation_token])
+    binding.pry
+    @user = User.find_by(email_confirmation_token: user_credential_params[:email_confirmation_token])
 
     if !@user
       return render :json => { :error_msg => 'Email confirmation link is not valid.', :redirect => '/sign_up' }, :status => :not_acceptable
@@ -184,20 +199,10 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  def delete_account
-    @user = current_user
-
-    if @user.games.delete_all && @user.delete
-      return render :json => { :success_msg => 'Account successfully deleted' }, :status => :ok
-    else
-      return render :json => { :error_msg => 'There was an issue deleting account. Please try again.' }, :status => :bad_request
-    end
-  end
-
   private
 
   def user_credential_params
-    params.require(:auth).permit(:email, :original_password, :password, :password_confirmation, :password_reset_token)
+    params.require(:user).permit(:email, :email_confirmation_token, :original_password, :password, :password_confirmation, :password_reset_token)
   end
 
   def recaptcha_params

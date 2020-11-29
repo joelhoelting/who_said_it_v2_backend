@@ -5,7 +5,7 @@ Rails.application.routes.draw do
         post 'check_answer', on: :collection
       end
       resources :characters, :only => [:index, :show]
-      resources :quotes, :only => [:show]
+      resources :quotes, :only => [:index, :show]
       
       # Authentication
       get '/validate_token', :to => 'users#validate_token'

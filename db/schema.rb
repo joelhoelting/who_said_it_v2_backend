@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(version: 2019_08_03_060501) do
     t.string "difficulty"
     t.text "state"
     t.text "ten_quote_ids"
-    t.boolean "completed"
+    t.boolean "completed", default: false
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
