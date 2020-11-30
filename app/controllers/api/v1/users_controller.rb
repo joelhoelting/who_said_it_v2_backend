@@ -170,7 +170,6 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def confirm_email
-    binding.pry
     @user = User.find_by(email_confirmation_token: user_credential_params[:email_confirmation_token])
 
     if !@user
