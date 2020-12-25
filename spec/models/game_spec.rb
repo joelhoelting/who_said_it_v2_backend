@@ -1,29 +1,29 @@
 require 'rails_helper'
 
-RSpec.describe Game, type: :model do
+RSpec.describe Game, :type => :model do
   before do
     @password = "test123"
-    @user_with_games = User.create(email: "hasmanygames@email.com", password: @password)
-    @user_without_games = User.create(email: "hasnogames@email.com", password: @password)
+    @user_with_games = User.create(:email => "hasmanygames@email.com", :password => @password)
+    @user_without_games = User.create(:email => "hasnogames@email.com", :password => @password)
 
     @game_without_difficulty_level = Game.new
 
-    @easy_game_invalid = Game.new(difficulty: "easy")
+    @easy_game_invalid = Game.new(:difficulty => "easy")
     @easy_game_invalid.add_characters_by_id([1,2,3])
 
-    @easy_game = Game.new(difficulty: "easy")
+    @easy_game = Game.new(:difficulty => "easy")
     @easy_game.add_characters_by_id([1,2])
 
-    @medium_game_invalid = Game.new(difficulty: "medium")
+    @medium_game_invalid = Game.new(:difficulty => "medium")
     @medium_game_invalid.add_characters_by_id([3,4,5,6])
 
-    @medium_game = Game.new(difficulty: "medium")
+    @medium_game = Game.new(:difficulty => "medium")
     @medium_game.add_characters_by_id([3,4,5])
 
-    @hard_game_invalid = Game.new(difficulty: "hard")
+    @hard_game_invalid = Game.new(:difficulty => "hard")
     @hard_game_invalid.add_characters_by_id([6,7,8,9,10])
 
-    @hard_game = Game.new(difficulty: "hard")
+    @hard_game = Game.new(:difficulty => "hard")
     @hard_game.add_characters_by_id([6,7,8,9])
 
     @user_with_games.games = [@easy_game, @medium_game, @hard_game]

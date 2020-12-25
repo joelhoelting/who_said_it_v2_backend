@@ -23,7 +23,7 @@ class ApplicationController < ActionController::API
       token = auth_header.split(' ')[1]
       # headers: { 'Authorization': 'Bearer <token>' }
       begin
-        JWT.decode(token, JWT_SECRET, true, algorithm: 'HS256')
+        JWT.decode(token, JWT_SECRET, true, :algorithm => 'HS256')
       rescue JWT::DecodeError
         nil
       end
@@ -38,7 +38,7 @@ class ApplicationController < ActionController::API
       # TODO REFRESH LOGIC
       # refresh_token(user_id)
 
-      @user = User.find_by(id: user_id)
+      @user = User.find_by(:id => user_id)
     end
   end
 

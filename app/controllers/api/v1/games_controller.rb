@@ -34,7 +34,7 @@ class Api::V1::GamesController < ApplicationController
 		@game = Game.find(params[:id])
 
 		if @game.completed
-			return render :json => { :error_msg => 'Resource cannot be modified'}, :status => :forbidden
+			return render :json => { :error_msg => 'Resource cannot be modified' }, :status => :forbidden
 		end
 		
 		@updated_game = @game.check_answer_and_update(answer_params)

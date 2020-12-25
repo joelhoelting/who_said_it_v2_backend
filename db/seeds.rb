@@ -74,24 +74,24 @@ characters = [
 ]
 
 def character_import(filename, name, description)
-  if Character.find_by(name: name).nil?
+  if Character.find_by(:name => name).nil?
     character = Character.create(
-      slug: filename,
-      name: name,
-      description: description
+      :slug => filename,
+      :name => name,
+      :description => description
     )
     
     json = ActiveSupport::JSON.decode(File.read("db/seeds/quotes/#{filename}.json"))
     json.each do |key, value|
       value.each do |quote|
-        if Quote.find_by(content: quote["content"]).nil?
-          Quote.create(content: quote["content"], source: quote["source"], character_id: character.id)
+        if Quote.find_by(:content => quote["content"]).nil?
+          Quote.create(:content => quote["content"], :source => quote["source"], :character_id => character.id)
         end
       end
     end
     puts "#{character.name} Seeded"
   else
-    puts "#{Character.find_by(name: name).name} already exists, skip seeding"
+    puts "#{Character.find_by(:name => name).name} already exists, skip seeding"
   end
 	
 end

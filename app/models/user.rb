@@ -5,10 +5,10 @@ class User < ApplicationRecord
   attribute :email_confirmed, :boolean, :default => false
 
   validates :email, 
-    presence: true, 
-    uniqueness: { case_sensitive: false, message: "Email has already been taken" }, 
-    format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i, message: "User input is invalid" }, 
-    on: :create
+    :presence => true, 
+    :uniqueness => { :case_sensitive => false, :message => "Email has already been taken" }, 
+    :format => { :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i, :message => "User input is invalid" }, 
+    :on => :create
 
   before_create :downcase_fields
 
@@ -24,7 +24,7 @@ class User < ApplicationRecord
     generate_token(:"#{token_type}_token")
     self[:"#{token_type}_sent_at"] = Time.now.utc
     save!
-    UsersMailer.with(user: self).send(token_type).deliver
+    UsersMailer.with(:user => self).send(token_type).deliver
   end
 
   def generate_token(column)

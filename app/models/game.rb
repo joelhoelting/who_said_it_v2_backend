@@ -1,12 +1,12 @@
 class Game < ApplicationRecord
-  belongs_to :user, optional: true
+  belongs_to :user, :optional => true
   has_and_belongs_to_many :characters
-  has_many :quotes, through: :characters
+  has_many :quotes, :through => :characters
 
   serialize :ten_quote_ids, Array
   serialize :state, Array
 
-  validates :difficulty, inclusion: { in: ['easy', 'medium', 'hard'], message: "Must have a difficulty level: easy, medium or hard" }
+  validates :difficulty, :inclusion => { :in => ['easy', 'medium', 'hard'], :message => "Must have a difficulty level: easy, medium or hard" }
   validate :validate_num_of_characters
 
   after_create :create_game_quotes

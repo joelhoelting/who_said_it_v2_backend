@@ -26,7 +26,7 @@ class Api::V1::UsersController < ApplicationController
       @user.update(:email => new_email)
       render :json => { :success_msg => 'Email has been updated', :user => @user.parsed_user_data }, :status => :ok
     else
-      render :json => { :error_msg => 'There was an issue updating your email address'}, :status => :not_found
+      render :json => { :error_msg => 'There was an issue updating your email address' }, :status => :not_found
     end
   end
 
@@ -43,10 +43,10 @@ class Api::V1::UsersController < ApplicationController
         @user.update(:password => new_password)
         render :json => { :success_msg => 'Password has been updated' }, :status => :ok
       else
-        render :json => { :error_msg => 'Passwords do not match'}, :status => :unauthorized
+        render :json => { :error_msg => 'Passwords do not match' }, :status => :unauthorized
       end
     else
-      render :json => { :error_msg => 'Original password is incorrect'}, :status => :not_found
+      render :json => { :error_msg => 'Original password is incorrect' }, :status => :not_found
     end
   end
 
@@ -72,7 +72,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def confirm_password_reset_token
-    @user = User.find_by(password_reset_token: params[:password_reset_token])
+    @user = User.find_by(:password_reset_token => params[:password_reset_token])
 
     if @user && @user.awaiting_confirmation?(:token_type => :password_reset)
       render :json => { :success_msg => 'Password reset link is valid' }, :status => :ok
@@ -84,14 +84,14 @@ class Api::V1::UsersController < ApplicationController
   def reset_password
     # return if !verify_recaptcha('reset_password', recaptcha_params[:token])
 
-    @user = User.find_by(password_reset_token: user_credential_params[:password_reset_token])
+    @user = User.find_by(:password_reset_token => user_credential_params[:password_reset_token])
 
     if @user && @user.token_expired?(:token_type => :password_reset, :expiration => 10.minutes)
-      return render :json => { :error_msg => 'Password reset link has expired. Please request a new one.'}, :status => :not_acceptable
+      return render :json => { :error_msg => 'Password reset link has expired. Please request a new one.' }, :status => :not_acceptable
     elsif @user
       @user.set_token_confirmed(:token_type => :password_reset)
       @user.update(:password => user_credential_params[:password])
-      render :json => { :success_msg => 'Password has been updated'}
+      render :json => { :success_msg => 'Password has been updated' }
     else
       render :json => { :error_msg => 'This resource is not authorized' }, :status => :unauthorized
     end
@@ -110,7 +110,7 @@ class Api::V1::UsersController < ApplicationController
     if @user.authentication_lockout
       time_to_wait = Time.now - @user.last_failed_login_attempt
       if time_to_wait < 5.minutes
-        return render :json => { :error_msg => "You cannot login for #{(5.minutes - time_to_wait).round} seconds"}, :status => :unauthorized
+        return render :json => { :error_msg => "You cannot login for #{(5.minutes - time_to_wait).round} seconds" }, :status => :unauthorized
       else
         @user.update(:authentication_lockout => false, :failed_login_attempts => 0)
       end
@@ -123,7 +123,7 @@ class Api::V1::UsersController < ApplicationController
         @user.update(:failed_login_attempts => 0) if @user.failed_login_attempts > 0
         
         token = encode_token({ :user_id => @user.id })
-        render :json => { :jwt => token, :success_msg => 'Sign In successful', :user => @user.parsed_user_data }, :status => :accepted
+        render :json => { :jwt => token, :success_msg => 'Sign in successful', :user => @user.parsed_user_data }, :status => :accepted
       else
         render :json => { :error_msg => 'Please confirm your email address' }, :status => :forbidden
       end
@@ -159,7 +159,7 @@ class Api::V1::UsersController < ApplicationController
     @user = User.new(user_credential_params)
 
     if @user.valid?
-      @user.generate_token_and_send_instructions(token_type: :email_confirmation)
+      @user.generate_token_and_send_instructions(:token_type => :email_confirmation)
       render :json => { 
         :success_msg => "Confirmation email sent to #{@user.email}", 
         :email => @user.email, :success_msg => "Confirmation email sent to #{@user.email}" 
@@ -170,7 +170,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def confirm_email
-    @user = User.find_by(email_confirmation_token: user_credential_params[:email_confirmation_token])
+    @user = User.find_by(:email_confirmation_token => user_credential_params[:email_confirmation_token])
 
     if !@user
       return render :json => { :error_msg => 'Email confirmation link is not valid.', :redirect => '/sign_up' }, :status => :not_acceptable
@@ -188,7 +188,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def resend_confirmation_email
-    @user = User.find_by(email: user_credential_params[:email])
+    @user = User.find_by(:email => user_credential_params[:email])
 
     if !@user
       return render :json => { :error_msg => 'Cannot find a user with that email' }, :status => :not_acceptable

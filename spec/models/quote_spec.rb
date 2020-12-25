@@ -1,12 +1,12 @@
 require 'rails_helper'
 
-RSpec.describe Quote, type: :model do
+RSpec.describe Quote, :type => :model do
   before do
-    @character1 = Character.create(name: "Character 1", slug:"character_1", description: "This is Character 1")
+    @character1 = Character.create(:name => "Character 1", :slug => "character_1", :description => "This is Character 1")
 
-    @valid_quote = Quote.create(content: "Description of valid quote", source: "www.source1.com", character_id: @character1.id)
-    @quote_without_content = Quote.create(source: "www.quote_without_content.com", character_id: @character1.id)
-    @quote_without_source = Quote.create(content: "Description of quote without source", character_id: @character1.id)
+    @valid_quote = Quote.create(:content => "Description of valid quote", :source => "www.source1.com", :character_id => @character1.id)
+    @quote_without_content = Quote.create(:source => "www.quote_without_content.com", :character_id => @character1.id)
+    @quote_without_source = Quote.create(:content => "Description of quote without source", :character_id => @character1.id)
   end
 
   context 'model validations' do

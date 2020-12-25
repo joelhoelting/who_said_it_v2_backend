@@ -19,10 +19,16 @@ default: &default
   encoding: utf8
   # For details on connection pooling, see Rails configuration guide
   # http://guides.rubyonrails.org/configuring.html#database-pooling
+  host: localhost
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+credentials: &credentials
+  username: joelhoelting
+  password: password123
 
 development:
   <<: *default
+  <<: *credentials
   database: who_said_it_v2_development
 
   # The specified database role being used to connect to postgres.
@@ -32,7 +38,7 @@ development:
   username: joelhoelting
 
   # The password associated with the postgres role (username).
-  #password:
+  password: password123
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have
   # domain sockets, so uncomment these lines.
@@ -53,6 +59,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
+  <<: *credentials
   database: who_said_it_v2_test
 
 # As with config/secrets.yml, you never want to store sensitive information,

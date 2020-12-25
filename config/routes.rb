@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :games, :only => [:show, :create, :update, :index] do
-        post 'check_answer', on: :collection
+        post 'check_answer', :on => :collection
       end
       resources :characters, :only => [:index, :show]
       resources :quotes, :only => [:index, :show]
