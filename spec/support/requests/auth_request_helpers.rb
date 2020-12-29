@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AuthRequestHelpers
   def sign_up_user(email, password)
     user_hash = tap_user_hash(email, password)
