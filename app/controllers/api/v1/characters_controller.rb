@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Api::V1::CharactersController < ApplicationController
   skip_before_action :authorized, :only => [:index]
 

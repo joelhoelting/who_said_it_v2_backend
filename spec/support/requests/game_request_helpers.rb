@@ -1,12 +1,12 @@
 module GameRequestHelpers
   def create_game(hash)
     headers = { :CONTENT_TYPE => 'application/json' }
-    post '/api/v1/games', :params => hash.to_json, :headers => headers
+    post '/api/v1/games', :params => { :game => hash }.to_json, :headers => headers
   end
 
   def create_game_with_token(hash, token)
     headers = { :CONTENT_TYPE => 'application/json', :HTTP_AUTHORIZATION => "Bearer #{token}" }
-    post '/api/v1/games', :params => hash.to_json, :headers => headers
+    post '/api/v1/games', :params => { :game => hash }.to_json, :headers => headers
   end
 
   def validate_games(hash_array)

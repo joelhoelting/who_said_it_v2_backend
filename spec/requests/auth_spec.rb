@@ -53,52 +53,56 @@ RSpec.describe 'Authentication Requests', :type => :request do
   end
 
   context 'when confirming email address' do
-    it 'sends user a confirmation email after sign up' do
-      expect(ActionMailer::Base.deliveries.length).to eq(0)
+    before do
       sign_up_user(valid_email_two, valid_password_two)
-      expect(ActionMailer::Base.deliveries.length).to eq(1)
     end
 
+    let(:user) { User.find_by(:email => valid_email_two) }
+
     it 'receives an email with a confirmation link' do
-      sign_up_user(valid_email_two, valid_password_two)
       last_email_sent = ActionMailer::Base.deliveries[-1].encoded
       emailed_token = last_email_sent.scan(%r{(?<=http://localhost:8080/confirm_email/).{64}})[0]
 
       expect(User.last.email_confirmation_token).to eq(emailed_token)
     end
+
+    it 'user cannot login until visiting email confirmation link' do
+      sign_in_user(valid_email_two, valid_password_two)
+
+      expect_json_header
+      expect(response.status).to eq 403
+      expect(response_body_to_json).to include({ 'error_msg' => 'Please confirm your email address' })
+    end
+
+    it 'user can login after confirming email address' do
+      confirm_email(user.email_confirmation_token)
+      sign_in_user(valid_email_two, valid_password_two)
+
+      expect_json_header
+      expect(response.status).to eq 202
+      expect(response_body_to_json).to include({ 'success_msg' => 'Sign in successful' })
+    end
   end
 
-  # context 'when signing in user' do
-  #   it 'fails to sign a user with wrong credentials' do
-  #     sign_in_user('validuser@valid.com', 'invaliduser123')
-  #     expect(response.header['Content-Type']).to include('application/json')
-  #     expect(response.status).to eq 401
-  #     expect(response_body_to_json['error']).to eq('Invalid credentials')
-  #   end
+  context 'when signing in user' do
+    before do
+      sign_up_user(valid_email_two, valid_password_two)
+    end
 
-  #   # it 'succeeds when signing in an existing user' do
-  #   #   sign_in_user('validuser@valid.com', 'validuser123')
-  #   #   current_user = response_body_to_json['user']
+    it 'fails to sign a user with wrong credentials' do
+      sign_in_user(valid_email_two, 'invaliduser123')
 
-  #   #   expect(response.header['Content-Type']).to include('application/json')
-  #   #   expect(response.status).to eq 202
-  #   #   expect(User.find_by(email: 'validuser@valid.com').id).to eq(current_user['id'])
-  #   # end
-  # end
+      expect_json_header
+      expect(response.status).to eq 401
+      expect(response_body_to_json).to include({ 'error_msg' => 'Password is invalid.' })
+    end
 
-  # context 'authorized resources require a JWT' do
-  #   it 'fails in accessing protected route (/profile) without token' do
-  #     get_route_without_token('/api/v1/profile')
-  #     expect(response.status).to eq 401
-  #     expect(response_body_to_json['message']).to eq 'Please log in'
-  #   end
+    it 'locks a user out of their account if they fail to login too many times' do
+      7.times { sign_in_user(valid_email_two, 'invaliduser123') }
 
-  #   it 'succeeds in accessing protected route (/profile) with token' do
-  #     sign_in_user('validuser@valid.com', 'validuser123')
-  #     token = response_body_to_json['jwt']
-  #     get_route_with_token('/api/v1/profile', token)
-  #     user_response = response_body_to_json['user']
-  #     expect(@valid_user.id).to eq(user_response['id'])
-  #   end
-  # end
+      expect(response_body_to_json).to include({ 'error_msg' => 'Password is invalid. 1 attempts remaining.' })
+      sign_in_user(valid_email_two, 'invaliduser123')
+      expect(response_body_to_json).to include({ 'error_msg' => 'You have logged in too many times. Please wait 5 minutes.'})
+    end
+  end
 end
