@@ -1,0 +1,7 @@
+.DS_Store
+.bin
+.git
+.gitignore
+.bundle
+.rspec
+tmp
