@@ -5,8 +5,11 @@ WORKDIR /app
 COPY Gemfile /app/Gemfile
 COPY Gemfile.lock /app/Gemfile.lock
 
-RUN gem install bundler && bundle install --jobs 20 --retry 5
+RUN gem install bundler && bundle install --jobs 20 --retry 5 --without development test
 
+# Set Rails to run in production
+ENV RAILS_ENV production 
+ENV RACK_ENV production
 ENV DB_HOST db
 
 COPY . /app
@@ -15,6 +18,7 @@ COPY . /app
 COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
+EXPOSE 3000
 
 # Start the main process.
-CMD ["rails", "s", "-b", "0.0.0.0"]
+CMD ["rails", "s", "-e", "production"]

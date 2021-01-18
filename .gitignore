@@ -5,11 +5,11 @@
 #   git config --global core.excludesfile '~/.gitignore_global'
 
 # Ignore bundler config.
-/.bundle
+main/.bundle
 
 # Ignore all logfiles and tempfiles.
-/log/*
-/tmp/*
+log/*
+tmp/*
 !/log/.keep
 !/tmp/.keep
 
@@ -20,16 +20,10 @@
 .byebug_history
 
 # Ignore master key for decrypting credentials and more.
-/config/master.key
+main/config/master.key
 
 # Ignore commands file
 commands.txt
-
-# Ignore ebextensions
-# /.ebextensions/*
-
-# Ignore dotenv
-.env.production.local
 
 .DS_Store
 
