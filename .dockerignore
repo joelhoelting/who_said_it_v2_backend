@@ -1,7 +1,7 @@
-.DS_Store
-.bin
+rails_app/.DS_Store
+rails_app/.bin
 .git
 .gitignore
-.bundle
-.rspec
-tmp
+rails_app/.bundle
+rails_app/.rspec
+rails_app/tmp
