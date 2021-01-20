@@ -7,7 +7,7 @@ services:
     networks:
       nginx_default:
           aliases:
-              - who_said_it_v2_api
+            - who_said_it_v2_api
   nginx:
     image: nginx
     volumes:
