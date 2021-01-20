@@ -1,6 +1,6 @@
 FROM ruby:2.6.6
 
-RUN apt-get update -qq && apt-get install -y postgresql-client
+RUN apt-get update -qq && apt-get install -y postgresql-client vim
 WORKDIR /app
 
 COPY rails_app/Gemfile /app/Gemfile
