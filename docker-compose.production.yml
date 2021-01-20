@@ -17,7 +17,8 @@ services:
         aliases:
           - proxy-name
     ports:
-      - 3000:80
+      ports:
+        - 1234:80
 volumes:
   assets:
 networks:
