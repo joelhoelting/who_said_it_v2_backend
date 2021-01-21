@@ -4,22 +4,22 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.production
-    networks:
-      nginx_default:
-          aliases:
-            - who_said_it_v2_api
+    image: joelhoelting/who_said_it_v2_api
+    links:
+      - db
+    volumes:
+      - ./rails_app:/app
+  db:
+    image: postgres
+    volumes:
+      - ./rails_app/tmp/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD
   nginx:
     image: nginx
     volumes:
       - ./nginx.production.conf:/etc/nginx/conf.d/default.conf
-    networks:
-      nginx_default:
-        aliases:
-          - proxy-name
+    links:
+      - app
     ports:
-      - 1234:80
-volumes:
-  assets:
-networks:
-  nginx_default:
-    external: true
+      - 8080:80

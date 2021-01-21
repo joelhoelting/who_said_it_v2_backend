@@ -1,6 +1,6 @@
 FROM ruby:2.6.6
 
-RUN apt-get update -qq && apt-get install -y postgresql-client vim
+RUN apt-get update -qq && apt-get install -y postgresql-client
 WORKDIR /app
 
 COPY rails_app/Gemfile /app/Gemfile
@@ -11,6 +11,7 @@ RUN gem install bundler && bundle install --jobs 20 --retry 5 --without developm
 # Set Rails to run in production
 ENV RAILS_ENV production 
 ENV RACK_ENV production
+
 ENV DB_HOST db
 
 COPY rails_app/. /app
@@ -20,5 +21,6 @@ COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 
+EXPOSE 3000
 # Start the main process.
 CMD ["rails", "s", "-e", "production"]

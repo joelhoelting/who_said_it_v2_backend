@@ -1,8 +1,8 @@
 version: "3.9"
 services:
   app:
-    image: joelhoelting/who_said_it_v2_api
     build: .
+    image: joelhoelting/who_said_it_v2_api
     volumes:
       - ./rails_app:/app
     ports:
