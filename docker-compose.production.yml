@@ -27,7 +27,19 @@ services:
     image: nginx
     volumes:
       - ./nginx.production.conf:/etc/nginx/conf.d/default.conf
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/app/certbot
     networks: 
      - frontend 
     ports:
       - 80:80
+      - 443:443
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./nginx.production.conf:/etc/nginx/conf.d/default.conf
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/app/certbot
+    networks: 
+     - frontend 
+    

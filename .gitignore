@@ -25,5 +25,8 @@ rails_app/config/master.key
 # Ignore commands file
 commands.txt
 
+# Ignore scripts
+deploy-prod.sh
+
 .DS_Store
 
