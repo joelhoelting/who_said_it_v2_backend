@@ -5,9 +5,12 @@
 
 # Read more: https://github.com/cyu/rack-cors
 
+# Prod/Dev envs
+# https://stackoverflow.com/questions/49985642/rails-5-1-cors-how-to-set-different-origins-for-different-environments
+
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins 'https://localhost:5000'
+    origins 'http://localhost:5000'
 
     resource '/api/v1/*',
              :headers => :any,
