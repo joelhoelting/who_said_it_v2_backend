@@ -14,7 +14,7 @@ rails_app/tmp/*
 !/rails_app/tmp/.keep
 
 # Certbot
-data/
+/data/*
 
 # Ignore uploaded files in development
 /rails_app/storage/*
