@@ -10,7 +10,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins 'http://localhost:5000'
+    origins Rails.application.credentials[Rails.env.to_sym][:url]
 
     resource '/api/v1/*',
              :headers => :any,
