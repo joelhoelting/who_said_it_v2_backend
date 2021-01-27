@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default :from => 'no-reply@whosaidit.co'
+  default :from => 'noreply@whosaidit.co'
   layout 'mailer'
 end
