@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default :from => 'joel@joelhoelting.com'
+  default :from => 'no-reply@whosaidit.co'
   layout 'mailer'
 end
