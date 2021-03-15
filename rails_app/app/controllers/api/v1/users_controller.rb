@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Api::V1::UsersController < ApplicationController
-  # include RecaptchaHelper
+  include RecaptchaHelper
   skip_before_action :authorized, :except => %i[delete_account update_email update_password validate_token]
 
   # Authorized
@@ -19,7 +19,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def update_email
-    # return if !verify_recaptcha('update_email', recaptcha_params[:token])
+    return unless verify_recaptcha('update_email', recaptcha_params[:token])
 
     @user = current_user
     new_email = user_credential_params[:email]
@@ -33,7 +33,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def update_password
-    # return if !verify_recaptcha('update_password', recaptcha_params[:token])
+    return unless verify_recaptcha('update_password', recaptcha_params[:token])
 
     if current_user == @user.authenticate(user_credential_params[:original_password])
       if passwords_match?(user_credential_params[:password], user_credential_params[:password_confirmation])
@@ -58,7 +58,7 @@ class Api::V1::UsersController < ApplicationController
   # Unauthorized
 
   def request_password_reset
-    # return if !verify_recaptcha('request_password_reset', recaptcha_params[:token])
+    return unless verify_recaptcha('request_password_reset', recaptcha_params[:token])
 
     @user = User.find_by(:email => user_credential_params[:email])
 
@@ -83,7 +83,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def reset_password
-    # return if !verify_recaptcha('reset_password', recaptcha_params[:token])
+    return unless verify_recaptcha('reset_password', recaptcha_params[:token])
 
     @user = User.find_by(:password_reset_token => user_credential_params[:password_reset_token])
 
@@ -101,7 +101,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def sign_in
-    # return if !verify_recaptcha('sign_in', recaptcha_params[:token])
+    return unless verify_recaptcha('sign_in', recaptcha_params[:token])
 
     @user = User.find_by(:email => user_credential_params[:email])
 
@@ -154,7 +154,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def sign_up
-    # return if !verify_recaptcha('sign_up', recaptcha_params[:token])
+    return unless verify_recaptcha('sign_up', recaptcha_params[:token])
 
     # Check if user with email already exists
     if User.find_by(:email => user_credential_params[:email])

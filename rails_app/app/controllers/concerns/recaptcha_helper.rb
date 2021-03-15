@@ -1,4 +1,6 @@
 module RecaptchaHelper
+  extend ActiveSupport::Concern
+
   RECAPTCHA_MINIMUM_SCORE = 0.5
 
   def verify_recaptcha(recaptcha_action, token)
